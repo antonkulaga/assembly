@@ -23,7 +23,6 @@ class SequenceGenerator{
     randomize(parameters, maxTries)
   }
 
-  def generateHOR(prefix: String, suffix: String, parameters: GenerationParameters) = ???
 }
 
 
@@ -38,18 +37,15 @@ object GenerationParameters {
 
   def apply( sequenceTemplate: SequenceTemplate,
              maximumRepeatSize: Int,
-             enzymesToAvoid: Set[String],
              gcContent: ContentGC,
-             restrictions: RestrictionEnzymes = RestrictionEnzymes.default): GenerationParameters = new GenerationParameters {
+             restrictions: RestrictionEnzymes): GenerationParameters = new GenerationParameters {
     override def template: SequenceTemplate = sequenceTemplate
 
     override def maxRepeatSize: Int = maximumRepeatSize
 
-    override def avoidEnzymes: Set[String] = enzymesToAvoid
-
     override def contentGC: ContentGC = gcContent
 
-    override def enzymesLibrary: RestrictionEnzymes = restrictions
+    override def enzymes: RestrictionEnzymes = restrictions
   }
 }
 
@@ -57,29 +53,29 @@ trait GenerationParameters{
 
   def template: SequenceTemplate
   def maxRepeatSize: Int
-  def avoidEnzymes: Set[String]
   def contentGC: ContentGC
-  def enzymesLibrary: RestrictionEnzymes
+  def enzymes: RestrictionEnzymes
 
 
   def check(sequence: String): Boolean = checkEnzymes(sequence) && checkRepeats(sequence) && checkGC(sequence)
 
-  def checkEnzymes(sequence: String): Boolean = enzymesLibrary.notIncludesEnzymes(sequence, avoidEnzymes)
+  def checkEnzymes(sequence: String): Boolean = enzymes.canCut(sequence, true)
 
   def checkGC(sequence: String): Boolean = contentGC.checkGC(sequence)
 
-  def checkRepeats(sequence: String): Boolean = repeatingSub(sequence, maxRepeatSize).isEmpty
+  def checkRepeats(sequence: String): Boolean = repeats(sequence, maxRepeatSize).isEmpty
 
-  def repeatingSub(str: String, length: Int): Map[String, Int] = {
+  def repeats(str: String, length: Int): Map[String, Int] = {
     val slide = str.sliding(length)
     slide.foldLeft(Map.empty[String, Int]){
       case (acc, s) => if(acc.contains(s)) acc.updated(s, acc(s) + 1) else acc.updated(s, 1)
     }.filter(_._2 > 1)
   }
 
-  def findLargestRepeats(sequence: String, length: Int = maxRepeatSize): Map[String, Int] = if(length == 1) Map.empty else
+
+  def findLongestRepeats(sequence: String, length: Int = maxRepeatSize): Map[String, Int] = if(length == 1) Map.empty else
   {
-    val mp = repeatingSub(sequence, length)
-    if(mp.isEmpty) findLargestRepeats(sequence, length -1) else mp
+    val mp = repeats(sequence, length)
+    if(mp.isEmpty) findLongestRepeats(sequence, length -1) else mp
   }
 }

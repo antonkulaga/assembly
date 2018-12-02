@@ -1,7 +1,7 @@
 package assembly.cloning
 
-object CommonEnzymes {
-  val common = Map[String, String](
+case object CommonEnzymes {
+  val common: Set[(String, String)] = Set[(String, String)](
     "SinI" -> "GGWCC",
     "BamHI" -> "GGATCC",
     "BmeRI" -> "GACNNNNNGTC",

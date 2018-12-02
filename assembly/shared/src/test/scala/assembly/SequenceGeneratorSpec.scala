@@ -1,5 +1,6 @@
 package assembly
 
+import assembly.cloning.RestrictionEnzymes
 import assembly.synthesis._
 
 import scala.util._
@@ -15,18 +16,18 @@ class SequenceGeneratorSpec extends WordSpec with Matchers {
       val sequence = "GNNCTNGCCTTCGTTGGAAACGGAYATNTGGNSNKNTNTNNGGNCTTCNYATAANNNCTAGANGNGTGNNCANAGGTNAACMNTYCNTTNSANGGNNCGAAACATTCTNAGNAGANNTTKGAAACTTTCTNTGTGAGCGCTCACAAANNGGTGTGAGCGCTCACATGRANA"
       val avoid = Set("AgeI", "SpeI", "NotI", "PstI", "EcoRI", "NotI", "XbaI", "NgoMIV")
 
-      lazy val default = GenerationParameters(StringTemplate(sequence), 20, avoid, ContentGC.default)
+      lazy val default = GenerationParameters(StringTemplate(sequence), 20, ContentGC.default, RestrictionEnzymes.GOLDEN_GATE)
 
       lazy val parameters = default
 
-        for(_ <- 1 to 10){
-          val result = generator.generateRepeat(parameters).get
-          parameters.check(result) shouldEqual true
-          val gc = parameters.contentGC.countGC(result)
-          val percent = gc / result.length.toDouble
-          percent shouldEqual parameters.contentGC.ratioGC(result)
-          assert(percent >= parameters.contentGC.minTotal && percent <= parameters.contentGC.maxTotal)
-        }
+      for(_ <- 1 to 10){
+        val result = generator.generateRepeat(parameters).get
+        parameters.check(result) shouldEqual true
+        val gc = parameters.contentGC.countGC(result)
+        val percent = gc / result.length.toDouble
+        percent shouldEqual parameters.contentGC.ratioGC(result)
+        assert(percent >= parameters.contentGC.minTotal && percent <= parameters.contentGC.maxTotal)
+      }
     }
   }
 

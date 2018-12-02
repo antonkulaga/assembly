@@ -101,6 +101,13 @@ package object extensions
       string.toUpperCase.map(s=>convertNucleotide(s).randomize)
     }
 
+    /**
+      * Finds all inclusions of current string into where string
+      * @param where
+      * @param start at which index to start
+      * @param acc accumulator required for recursive
+      * @return List of indexes found
+      */
     @tailrec final def inclusionsInto(where: String, start: Int = 0, acc: List[Int] = Nil): List[Int] = where.indexOf(string, start) match {
       case -1 => acc.reverse
       case index => inclusionsInto(where, index + 1, index :: acc)
