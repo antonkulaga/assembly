@@ -9,15 +9,15 @@ import scala.util.Try
 object SequenceGenerator extends SequenceGenerator
 class SequenceGenerator{
 
-  def randomize(parameters: GenerationParameters, max: Int = 1000): String = if(max>0){
+  def randomize(parameters: GenerationParameters, max: Int, count: Int = 0): String = if(max>0){
     val result = parameters.template.randomize
-    if(parameters.check(result)) result else randomize(parameters, max -1)
+    if(parameters.check(result)) result else randomize(parameters, max -1, count + 1)
   } else {
-    throw new Exception(s"We tried to generate a proper sequence more than ${max} times and failed!")
+    throw new Exception(s"We tried to generate a proper sequence more than ${count} times and failed!")
   }
 
 
-  def generateRepeat(parameters: GenerationParameters, maxTries: Int = 1000 ) = Try {
+  def tryRandomize(parameters: GenerationParameters, maxTries: Int ) = Try {
     //assert( parameters.check(parameters.template), "Template should not contain restriction sites that must be avoided")
     //assert( parameters.checkGC(parameters.template), "Template should fit into GC requirements")
     randomize(parameters, maxTries)
@@ -57,9 +57,9 @@ trait GenerationParameters{
   def enzymes: RestrictionEnzymes
 
 
-  def check(sequence: String): Boolean = checkEnzymes(sequence) && checkRepeats(sequence) && checkGC(sequence)
+  def check(sequence: String): Boolean = checkRepeats(sequence) && checkGC(sequence) && checkEnzymes(sequence)
 
-  def checkEnzymes(sequence: String): Boolean = enzymes.canCut(sequence, true)
+  def checkEnzymes(sequence: String): Boolean = !enzymes.canCut(sequence, true)
 
   def checkGC(sequence: String): Boolean = contentGC.checkGC(sequence)
 

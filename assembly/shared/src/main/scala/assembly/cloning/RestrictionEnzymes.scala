@@ -11,6 +11,7 @@ import scala.io.Source
   */
 case class RestrictionEnzymes(enzymes2sites: Set[(String, String)]) {
 
+
   lazy val enzymes2sitesMap: Map[String, String] = enzymes2sites.toMap
 
   lazy val sites2enzymes: Set[(String, String)] = enzymes2sites.map(_.swap)
@@ -37,14 +38,16 @@ case class RestrictionEnzymes(enzymes2sites: Set[(String, String)]) {
     * @return
     */
   def canCut(where: String, reverseComplement: Boolean): Boolean = {
-    enzymes2sites.exists{ case (_, site) => where.contains(site)} || (reverseComplement && canCut(where, false))
+    enzymes2sites.exists{ case (_, site) => where.contains(site)} && (!reverseComplement || canCut(where.reverseComplement, false))
   }
 
 
 }
+
 object RestrictionEnzymes {
 
 
+  val BsaI = RestrictionEnzyme("BsaI" , "GGTCTC", 7, 11)
 
   lazy val commonEnzymesSet: Set[(String, String)] = CommonEnzymes.common
 

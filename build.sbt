@@ -14,7 +14,7 @@ lazy val assembly =
 
         organization := "group.aging-research",
 
-	      version := "0.0.2",
+	      version := "0.0.3",
 
         resolvers += sbt.Resolver.bintrayRepo("comp-bio-aging", "main"),
 

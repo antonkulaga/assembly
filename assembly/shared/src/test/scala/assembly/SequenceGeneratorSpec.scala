@@ -14,14 +14,15 @@ class SequenceGeneratorSpec extends WordSpec with Matchers {
       lazy val generator = new SequenceGenerator
 
       val sequence = "GNNCTNGCCTTCGTTGGAAACGGAYATNTGGNSNKNTNTNNGGNCTTCNYATAANNNCTAGANGNGTGNNCANAGGTNAACMNTYCNTTNSANGGNNCGAAACATTCTNAGNAGANNTTKGAAACTTTCTNTGTGAGCGCTCACAAANNGGTGTGAGCGCTCACATGRANA"
-      val avoid = Set("AgeI", "SpeI", "NotI", "PstI", "EcoRI", "NotI", "XbaI", "NgoMIV")
+      //val avoid = Set("AgeI", "SpeI", "NotI", "PstI", "EcoRI", "NotI", "XbaI", "NgoMIV")
+      //val bioBrick = RestrictionEnzymes(RestrictionEnzymes.commonEnzymesSet.filter{ case (e, _)=> avoid.contains(e)})
 
       lazy val default = GenerationParameters(StringTemplate(sequence), 20, ContentGC.default, RestrictionEnzymes.GOLDEN_GATE)
 
       lazy val parameters = default
 
       for(_ <- 1 to 10){
-        val result = generator.generateRepeat(parameters).get
+        val result = generator.tryRandomize(parameters, 10000).get
         parameters.check(result) shouldEqual true
         val gc = parameters.contentGC.countGC(result)
         val percent = gc / result.length.toDouble
