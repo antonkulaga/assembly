@@ -25,15 +25,15 @@ class GoldenGateSpec extends WordSpec with Matchers{
       val three = "CAAGACAGAAGCATTCTCAGAAACCTCTTTGTG"
 
       val gold = GoldenGate(RestrictionEnzymes.BsaI)
-      val flankLeft = site + "C"
-      val flankRight = "C" + revCom
+      val flankLeft = "CCTG"
+      val flankRight = "GGAA"
       val oneS::twoS::threeS::Nil = gold.synthesize(one::two::three::Nil, flankLeft, flankRight)
 
-      val oneR: String = flankLeft +"ATTTGGAGAGCTCTGAAAATTT" + "CGTACGAGACC"
+      val oneR: String = "GGTCTCCCCTGATTTGGAGAGCTCTGAAAATTTCGTACGAGACC"
       oneS shouldEqual oneR
-      val twoR: String = "GGTCTCC" + "CGTAGGAAATGTGAGCGCTCACAAATAAAAT" + "CAAGCGAGACC"
+      val twoR: String = "GGTCTCCCGTAGGAAATGTGAGCGCTCACAAATAAAATCAAGCGAGACC"
       twoS shouldEqual  twoR
-      val threeR: String = "GGTCTCC" + "CAAGACAGAAGCATTCTCAGAAACCTCTTTGTG" + flankRight
+      val threeR: String = "GGTCTCCCAAGACAGAAGCATTCTCAGAAACCTCTTTGTGGGAACGAGACC"
       threeS shouldEqual threeR
 
       println(oneR)
