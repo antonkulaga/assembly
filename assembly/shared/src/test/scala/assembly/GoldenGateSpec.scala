@@ -42,9 +42,11 @@ class GoldenGateSpec extends WordSpec with Matchers{
 
     }
 
-    /*
+
     "suggest golden-gate flanking to any type of sequences that do not have GoldenGate sites" in {
-      lazy val generator = new SequenceGenerator
+      lazy val generator = new SequenceGeneratorGold(GoldenGate(RestrictionEnzymes.BsaI))
+      val site = "GGTCTC"
+      val revCom = "GAGACC"
 
       val sequence = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
       //val avoid = Set("AgeI", "SpeI", "NotI", "PstI", "EcoRI", "NotI", "XbaI", "NgoMIV")
@@ -53,15 +55,25 @@ class GoldenGateSpec extends WordSpec with Matchers{
       lazy val parameters: GenerationParameters = GenerationParameters(StringTemplate(sequence), 20, ContentGC.default, RestrictionEnzymes.GOLDEN_GATE)
 
       for(_ <- 1 to 10){
-        val one = generator.randomize(parameters, 10000)
-        val two = generator.randomize(parameters, 10000)
-        val three = generator.randomize(parameters, 10000)
-        val syn = GoldenGate(RestrictionEnzymes.BsaI)
-
+       // generator.randomizeMany(parameters, 3, )
+        val generated  = generator.randomizeMany(parameters, 20, 10000)
+        val gold = GoldenGate(RestrictionEnzymes.BsaI)
+        val flankLeft = "CCTG"
+        val flankRight = "GGAA"
+        val gen_syn = gold.synthesize(generated, flankLeft, flankRight)
+        val firstS = gen_syn.head
+        val lastS = gen_syn.last
+        firstS.startsWith(site +"C" + flankLeft) shouldEqual true
+        lastS.endsWith(flankRight +"C" + revCom) shouldEqual true
+        val fourS = gen_syn(4)
+        val fiveS = gen_syn(5)
+        gen_syn.forall(_.startsWith(site)) shouldEqual  true
+        gen_syn.forall(_.endsWith("C" + revCom)) shouldEqual  true
+        fourS.substring(fourS.length - gold.enzyme.forwardCut - 4, fourS.length - gold.enzyme.forwardCut) shouldEqual
+          fiveS.substring(gold.enzyme.forwardCut, gold.enzyme.forwardCut + Math.abs(gold.enzyme.stickyLength))
 
       }
     }
-    */
   }
   /*
    lazy val default = GenerationParameters(StringTemplate(sequence), 20, ContentGC.default, RestrictionEnzymes.GOLDEN_GATE)

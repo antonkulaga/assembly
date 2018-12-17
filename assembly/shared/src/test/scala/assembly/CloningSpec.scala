@@ -15,18 +15,17 @@ class CloningSpec extends WordSpec with Matchers  {
 
       val sequence = "CAACACNTNNNGGTCTCNNGNNGGTCTCCAACAC"
 
-      lazy val parameters = GenerationParameters(StringTemplate(sequence), 20, ContentGC.default, RestrictionEnzymes.GOLDEN_GATE)
+      lazy val parameters = GenerationParameters(StringTemplate(sequence), 20, ContentGC.default, RestrictionEnzymes.empty)
       for(_ <- 0 until 1000 ){
-        val seq = generator.tryRandomize(parameters, 1000).get
-        val found = RestrictionEnzymes.GOLDEN_GATE.find(seq, false)
+        val seq = generator.tryRandomize(parameters, 10000).get
+        RestrictionEnzymes.GOLDEN_GATE.canCut(sequence, true) shouldEqual true
+        val found = RestrictionEnzymes( RestrictionEnzymes.commonEnzymesSet.filter{ case (e, _)=> e =="BsaI" || e == "BsbI"}).find(seq, false)
         found shouldEqual
             Map(
               ("BsaI", "GGTCTC") -> List(11, 22),
               ("BsbI", "CAACAC") -> List(0, 28)
             )
       }
-      //  "BsbI" -> "CAACAC"
-      // "BsaI" -> "GGTCTC",
     }
 
     "process forward and reverse cuts properly" in {

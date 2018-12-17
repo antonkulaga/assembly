@@ -13,7 +13,7 @@ trait RestrictionEnzymeLike extends SearchDNA {
 
   def reverseCut: Int
 
-  def stickyPart: Int = forwardCut - reverseCut
+  def stickyLength: Int = Math.abs(forwardCut - reverseCut)
 
   def forwardGap: Int = forwardCut - site.length
   def reverseGap: Int = reverseCut - site.length

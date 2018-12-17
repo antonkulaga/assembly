@@ -4,7 +4,6 @@ import assembly.cloning
 import assembly.extensions._
 
 import scala.io.Source
-
 /**
   * Class to work with restriction enzymes
   * @param enzymes2sites
@@ -38,7 +37,7 @@ case class RestrictionEnzymes(enzymes2sites: Set[(String, String)]) {
     * @return
     */
   def canCut(where: String, reverseComplement: Boolean): Boolean = {
-    enzymes2sites.exists{ case (_, site) => where.contains(site)} && (!reverseComplement || canCut(where.reverseComplement, false))
+    enzymes2sites.exists{ case (_, site) => where.contains(site)} || (reverseComplement && canCut(where.reverseComplement, false))
   }
 
 
@@ -48,13 +47,16 @@ object RestrictionEnzymes {
 
 
   val BsaI = RestrictionEnzyme("BsaI" , "GGTCTC", 7, 11)
+  val BbsI = RestrictionEnzyme("BbsI" , "GAAGAC", 8, 12)
+  val BsmBI = RestrictionEnzyme("BsmBI", "CGTCTC", 7, 11)
 
   lazy val commonEnzymesSet: Set[(String, String)] = CommonEnzymes.common
 
   val ALL_COMMON_ENZYMES = RestrictionEnzymes(commonEnzymesSet)
   val GOLDEN_GATE_BsaI = RestrictionEnzymes(commonEnzymesSet.filter{ case (e, _)=> e =="BsaI" })
   val GOLDEN_GATE_BsbI = RestrictionEnzymes(commonEnzymesSet.filter{ case (e, _)=> e == "BsbI"})
-  val GOLDEN_GATE = RestrictionEnzymes(commonEnzymesSet.filter{ case (e, _)=> e =="BsaI" || e == "BsbI"}) //,  "BspTNI" -> "GGTCTC",  "Bso31I" -> "GGTCTC", "Eco31I" -> "GGTCTC"
+  val GOLDEN_GATE = RestrictionEnzymes(commonEnzymesSet.filter{ case (e, _)=> e =="BsaI" || e == "BsbI" || e == "BsmBI"})
+  //,  "BspTNI" -> "GGTCTC",  "Bso31I" -> "GGTCTC", "Eco31I" -> "GGTCTC"
 
   lazy val empty = RestrictionEnzymes(Set.empty[(String, String)])
   def apply(enzymes: (String, String)*): RestrictionEnzymes = RestrictionEnzymes(Set(enzymes:_*))
