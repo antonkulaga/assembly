@@ -42,6 +42,26 @@ class GoldenGateSpec extends WordSpec with Matchers{
 
     }
 
+    "check for differences of sticky edges and GC" in {
+      val g = GoldenGate(RestrictionEnzymes.BsaI)
+      val one = List("ATTTGGAGAGCTCTGAAAATTT",
+        "CGTAGGAAATGTGAGCGCTCACAAATAAAAT",
+        "CAAGACAGAAGCATTCTCAGAAACCTCTTTGTG"
+      )
+      g.checkEnds(one.last, one.take(2)) shouldEqual true
+      val two = List("ATTTGGAGAGCTCTGAAAATTT",
+        "CGTAGGAAATGTGAGCGCTCACAAATAAAAT",
+        "TAATACAGAAGCATTCTCAGAAACCTCTTTGTG"
+      )
+      g.checkEnds(two.last, two.take(2), 2, 1) shouldEqual false
+      val three = List("ATTTGGAGAGCTCTGAAAATTT",
+        "CGTAGGAAATGTGAGCGCTCACAAATAAAAT",
+        "ATTGACAGAAGCATTCTCAGAAACCTCTTTGTG"
+      )
+      g.checkEnds(three.last, three.take(2), 1, 1) shouldEqual true
+      g.checkEnds(three.last, three.take(2), 2, 1) shouldEqual false
+    }
+
 
     "suggest golden-gate flanking to any type of sequences that do not have GoldenGate sites" in {
       lazy val generator = new SequenceGeneratorGold(GoldenGate(RestrictionEnzymes.BsaI))

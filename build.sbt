@@ -3,18 +3,18 @@ import sbt.Keys._
 // shadow sbt-scalajs' crossProject and CrossType from Scala.js 0.6.x
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-lazy val circeVersion = "0.10.1"
+lazy val circeVersion = "0.11.0"
 
 lazy val assembly =
   crossProject(JSPlatform, JVMPlatform)
     .settings(
         name := "assembly",
 
-        scalaVersion := "2.12.7",
+        scalaVersion := "2.12.8",
 
         organization := "group.aging-research",
 
-	      version := "0.0.4",
+	      version := "0.0.6",
 
         resolvers += sbt.Resolver.bintrayRepo("comp-bio-aging", "main"),
 
@@ -33,8 +33,8 @@ lazy val assembly =
         licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
         
         libraryDependencies ++= Seq(
-            "org.typelevel" %%% "cats-core" % "1.4.0",
-            "org.wvlet.airframe" %%% "airframe-log" % "0.74",
+            "org.typelevel" %%% "cats-core" % "1.5.0",
+            "org.wvlet.airframe" %%% "airframe-log" % "0.78",
             "io.circe" %%% "circe-core"% circeVersion,
             "io.circe" %%% "circe-generic"% circeVersion,
             "io.circe" %%% "circe-generic-extras"% circeVersion,

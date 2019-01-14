@@ -10,11 +10,11 @@ import scala.util.Try
   * Sequence generator for golden gate
   * @param enzyme
   */
-case class  SequenceGeneratorGold(goldenGate: GoldenGate) extends SequenceGenerator{
+case class  SequenceGeneratorGold(goldenGate: GoldenGate, minStickyDifference: Int = 2, minGCbases: Int = 1) extends SequenceGenerator{
 
   final def randomizeMany(parameters: GenerationParameters, number: Int, maxTries: Int, acc: List[String] = Nil): List[String] = if(number==0) acc.reverse else {
     val result = randomize(parameters, maxTries)
-    if(goldenGate.checkEnds(result, acc)) randomizeMany(parameters, number - 1, maxTries, result::acc) else randomizeMany(parameters, number, maxTries - 1, acc)
+    if(goldenGate.checkEnds(result, acc, minStickyDifference, minGCbases)) randomizeMany(parameters, number - 1, maxTries, result::acc) else randomizeMany(parameters, number, maxTries - 1, acc)
   }
 
   def generateMany(parameters: GenerationParameters, number: Int, maxTries: Int, stickyLeft: String, stickyRight: String): List[String] = {
