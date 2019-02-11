@@ -2,15 +2,7 @@ package assembly
 
 import assembly.cloning.{GoldenGate, RestrictionEnzymes}
 import assembly.synthesis._
-import assembly.extensions._
-
-import scala.util._
 import org.scalatest._
-import cats.implicits._
-
-import scala.util._
-import org.scalatest._
-import cats.implicits._
 
 class GoldenGateSpec extends WordSpec with Matchers{
 
@@ -48,7 +40,7 @@ class GoldenGateSpec extends WordSpec with Matchers{
         "CGTAGGAAATGTGAGCGCTCACAAATAAAAT",
         "CAAGACAGAAGCATTCTCAGAAACCTCTTTGTG"
       )
-      g.checkEnds(one.last, one.take(2)) shouldEqual true
+      g.checkEnds(one.last, one.take(2), 2) shouldEqual true
       val two = List("ATTTGGAGAGCTCTGAAAATTT",
         "CGTAGGAAATGTGAGCGCTCACAAATAAAAT",
         "TAATACAGAAGCATTCTCAGAAACCTCTTTGTG"
@@ -95,18 +87,4 @@ class GoldenGateSpec extends WordSpec with Matchers{
       }
     }
   }
-  /*
-   lazy val default = GenerationParameters(StringTemplate(sequence), 20, ContentGC.default, RestrictionEnzymes.GOLDEN_GATE)
-
-      lazy val parameters = default
-
-      for(_ <- 1 to 10){
-        val result = generator.generateRepeat(parameters, 10000).get
-        parameters.check(result) shouldEqual true
-        val gc = parameters.contentGC.countGC(result)
-        val percent = gc / result.length.toDouble
-        percent shouldEqual parameters.contentGC.ratioGC(result)
-        assert(percent >= parameters.contentGC.minTotal && percent <= parameters.contentGC.maxTotal)
-      }
-   */
 }

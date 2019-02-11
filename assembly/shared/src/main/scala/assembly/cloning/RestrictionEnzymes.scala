@@ -2,7 +2,7 @@ package assembly.cloning
 
 import assembly.cloning
 import assembly.extensions._
-
+import scala.collection.compat._
 import scala.io.Source
 /**
   * Class to work with restriction enzymes

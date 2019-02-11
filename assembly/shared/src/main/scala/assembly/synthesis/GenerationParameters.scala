@@ -2,23 +2,70 @@ package assembly.synthesis
 
 import assembly.cloning.{RestrictionEnzyme, _}
 import assembly.extensions._
-
+import scala.collection.compat._
 import scala.annotation.tailrec
 import scala.util.Try
 
 /**
-  * Sequence generator for golden gate
+  * Sequence generator with GoldenGate posibilities
   * @param enzyme
   */
-case class  SequenceGeneratorGold(goldenGate: GoldenGate, minStickyDifference: Int = 2, minGCbases: Int = 1) extends SequenceGenerator{
+case class SequenceGeneratorGold(goldenGate: GoldenGate,
+                                 minStickyDifference: Int = 2,
+                                 minGCbases: Int = 1) extends SequenceGenerator{
 
-  final def randomizeMany(parameters: GenerationParameters, number: Int, maxTries: Int, acc: List[String] = Nil): List[String] = if(number==0) acc.reverse else {
-    val result = randomize(parameters, maxTries)
-    if(goldenGate.checkEnds(result, acc, minStickyDifference, minGCbases)) randomizeMany(parameters, number - 1, maxTries, result::acc) else randomizeMany(parameters, number, maxTries - 1, acc)
+
+  protected def prepareStickyTemplate(result: String, parameters: GenerationParameters): GenerationParameters = {
+    val slen = goldenGate.enzyme.stickyLength
+    val replacement = result.slice(slen, result.length - slen)
+    parameters.withReplacement(replacement, slen)
   }
 
-  def generateMany(parameters: GenerationParameters, number: Int, maxTries: Int, stickyLeft: String, stickyRight: String): List[String] = {
-    val sequences = randomizeMany(parameters, number, maxTries)
+
+  def generateSticky(result: String, parameters: GenerationParameters, stickyTries: Int,maxTries: Int, acc: List[String] = Nil): Option[String]  =
+    if(stickyTries <= 0) None else {
+      if(goldenGate.checkEnds(result, acc, minStickyDifference, minGCbases)) Some(result)
+        else generateSticky(randomize(parameters, maxTries), parameters, stickyTries -1, maxTries, acc)
+  }
+
+
+  /**
+    * Tries to randomize many sequences to fit them into GoldenGate synthesis
+    * @param parameters
+    * @param number
+    * @param maxTries
+    * @param maxStickyTries how many tries should be done for randomizing only sticky edges?
+    * @param acc
+    * @return
+    */
+  final def randomizeMany(parameters: GenerationParameters,
+                          number: Int, maxTries: Int, maxStickyTries: Int = 10,
+                          acc: List[String] = Nil): List[String] = if(number==0) acc.reverse else {
+    val result: String = randomize(parameters, maxTries)
+    if(goldenGate.checkEnds(result, acc, minStickyDifference, minGCbases))
+      randomizeMany(parameters, number - 1, maxTries, maxStickyTries, result::acc)
+    else
+      if(maxStickyTries == 0) randomizeMany(parameters, number, maxTries - 1, maxStickyTries, acc)
+    else {
+      val st = prepareStickyTemplate(result, parameters)
+      generateSticky(randomize(st, maxTries), st, maxStickyTries, maxTries, acc) match {
+        case Some(v) => randomizeMany(parameters, number - 1, maxTries, maxStickyTries, v::acc)
+        case None => randomizeMany(parameters, number, maxTries - 1, maxStickyTries, acc)
+      }
+    }
+  }
+
+  /**
+    * Generates many sequences from the same template that will be connected in a GoldenGate way
+    * @param parameters
+    * @param number
+    * @param maxTries
+    * @param stickyLeft
+    * @param stickyRight
+    * @return
+    */
+  def generateMany(parameters: GenerationParameters, number: Int, maxTries: Int, stickyLeft: String, stickyRight: String, maxStickyTries: Int = 10): List[String] = {
+    val sequences = randomizeMany(parameters, number, maxTries, maxStickyTries)
     goldenGate.synthesize(sequences, stickyLeft, stickyRight)
   }
 
@@ -44,7 +91,11 @@ class SequenceGenerator{
 
 }
 
-
+/*
+case class GenerationParameters(
+                                       template: StringTemplate, maxRepeatSize: Int, contentGC: ContentGC, enzymes: RestrictionEnzymes
+                                     ) extends GenerationParameters
+*/
 object GenerationParameters {
   /*
   implicit def monoid: cats.Monoid[GenerationParameters] = new cats.Monoid[GenerationParameters] {
@@ -57,15 +108,17 @@ object GenerationParameters {
   def apply( sequenceTemplate: SequenceTemplate,
              maximumRepeatSize: Int,
              gcContent: ContentGC,
-             restrictions: RestrictionEnzymes): GenerationParameters = new GenerationParameters {
-    override def template: SequenceTemplate = sequenceTemplate
+             restrictions: RestrictionEnzymes): GenerationParameters = GenerationParametersImpl(sequenceTemplate, maximumRepeatSize, gcContent, restrictions)
+}
 
-    override def maxRepeatSize: Int = maximumRepeatSize
+trait SequenceGenerationParameters extends GenerationParameters {
+  def template: SequenceTemplatePositional//SequenceTemplate
 
-    override def contentGC: ContentGC = gcContent
+}
 
-    override def enzymes: RestrictionEnzymes = restrictions
-  }
+case class GenerationParametersImpl(template: SequenceTemplate, maxRepeatSize: Int, contentGC: ContentGC, enzymes: RestrictionEnzymes) extends GenerationParameters
+{
+  def withReplacement(sequence: String, position: Int): GenerationParametersImpl = copy(template.withSequenceReplacement(sequence, position)) //UGLY part
 }
 
 trait GenerationParameters{
@@ -75,6 +128,7 @@ trait GenerationParameters{
   def contentGC: ContentGC
   def enzymes: RestrictionEnzymes
 
+  def withReplacement(sequence: String, position: Int): GenerationParameters  //UGLY part
 
   def check(sequence: String): Boolean = checkRepeats(sequence) && checkGC(sequence) && checkEnzymes(sequence)
 

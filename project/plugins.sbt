@@ -15,3 +15,5 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.11")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.2")
+
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.1")

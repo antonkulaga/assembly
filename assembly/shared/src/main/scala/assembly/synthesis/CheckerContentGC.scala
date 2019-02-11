@@ -2,7 +2,7 @@ package assembly.synthesis
 
 
 import io.circe.generic.JsonCodec
-
+import scala.collection.compat._
 
 trait CheckerGC{
 

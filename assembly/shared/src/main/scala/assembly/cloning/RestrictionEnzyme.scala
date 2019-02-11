@@ -2,11 +2,15 @@ package assembly.cloning
 
 import scala.annotation.tailrec
 import assembly.extensions._
+import scala.collection.compat._
 
 case class RestrictionEnzyme(name: String, site: String, forwardCut: Int, reverseCut: Int) extends RestrictionEnzymeLike {
 
 }
 
+/**
+  * Trait for all enzymes that can cut
+  */
 trait RestrictionEnzymeLike extends SearchDNA {
 
   def forwardCut: Int
@@ -22,7 +26,13 @@ trait RestrictionEnzymeLike extends SearchDNA {
 
   def name: String
 
+  /**
+    * Positions of all recognition sites in a forward strand of a sequence
+    * @param sequence
+    * @return
+    */
   def positionsForward(sequence: String): List[Int] = searchesOf(sequence, site)
+
   def positionsReverseComplement(sequence: String): List[Int] = {
     positionsForward(sequence.reverseComplement).map{ i => sequence.length - site.length - i}
   }
