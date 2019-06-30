@@ -6,13 +6,10 @@ import scala.collection.compat._
 import scala.annotation.tailrec
 import scala.util.Try
 
-/**
-  * Sequence generator with GoldenGate posibilities
-  * @param enzyme
-  */
+
 case class SequenceGeneratorGold(goldenGate: GoldenGate,
                                  minStickyDifference: Int = 2,
-                                 minGCbases: Int = 1) extends SequenceGenerator{
+                                 minGCbases: Int = 1, maxStickyTries: Int = 256) extends SequenceGenerator{
 
 
   protected def prepareStickyTemplate(result: String, parameters: GenerationParameters): GenerationParameters = {
@@ -25,8 +22,8 @@ case class SequenceGeneratorGold(goldenGate: GoldenGate,
   def generateSticky(result: String, parameters: GenerationParameters, stickyTries: Int,maxTries: Int, acc: List[String] = Nil): Option[String]  =
     if(stickyTries <= 0) None else {
       if(goldenGate.checkEnds(result, acc, minStickyDifference, minGCbases)) Some(result)
-        else generateSticky(randomize(parameters, maxTries), parameters, stickyTries -1, maxTries, acc)
-  }
+      else generateSticky(randomize(parameters, maxTries), parameters, stickyTries -1, maxTries, acc)
+    }
 
 
   /**
@@ -39,13 +36,13 @@ case class SequenceGeneratorGold(goldenGate: GoldenGate,
     * @return
     */
   final def randomizeMany(parameters: GenerationParameters,
-                          number: Int, maxTries: Int, maxStickyTries: Int = 10,
+                          number: Int, maxTries: Int, maxStickyTries: Int = maxStickyTries,
                           acc: List[String] = Nil): List[String] = if(number==0) acc.reverse else {
     val result: String = randomize(parameters, maxTries)
     if(goldenGate.checkEnds(result, acc, minStickyDifference, minGCbases))
       randomizeMany(parameters, number - 1, maxTries, maxStickyTries, result::acc)
     else
-      if(maxStickyTries == 0) randomizeMany(parameters, number, maxTries - 1, maxStickyTries, acc)
+    if(maxStickyTries == 0) randomizeMany(parameters, number, maxTries - 1, maxStickyTries, acc)
     else {
       val st = prepareStickyTemplate(result, parameters)
       generateSticky(randomize(st, maxTries), st, maxStickyTries, maxTries, acc) match {
@@ -136,7 +133,25 @@ trait GenerationParameters{
 
   def checkGC(sequence: String): Boolean = contentGC.checkGC(sequence)
 
-  def checkRepeats(sequence: String): Boolean = repeats(sequence, maxRepeatSize).isEmpty
+  def checkRepeats(sequence: String): Boolean = checkRepeats(sequence, maxRepeatSize)
+
+  /**
+    * UGLY MUTABLE!
+    * @param str
+    * @param len
+    * @return
+    */
+  def  checkRepeats(str: String, len: Int): Boolean = {
+    val set = scala.collection.mutable.Set[String]()
+    var i = 0
+    while(i <= str.length - len){
+      val s = str.slice(i, i + len)
+      if(set.contains(s)) return false
+      set += s
+      i += 1
+    }
+    true
+  }
 
   def repeats(str: String, length: Int): Map[String, Int] = {
     val slide = str.sliding(length)

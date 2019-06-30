@@ -16,7 +16,7 @@ lazy val assembly =
 
         organization := "group.aging-research",
 
-	      version := "0.0.10",
+	      version := "0.0.11",
 
         resolvers += sbt.Resolver.bintrayRepo("comp-bio-aging", "main"),
 
@@ -35,17 +35,27 @@ lazy val assembly =
         licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
         
         libraryDependencies ++= Seq(
-            "org.typelevel" %%% "cats-core" % "1.6.0",
+            "org.typelevel" %%% "cats-core" % "1.6.1",
             "io.circe" %%% "circe-core"% circeVersion,
             "io.circe" %%% "circe-generic"% circeVersion,
             "io.circe" %%% "circe-generic-extras"% circeVersion,
             "io.circe" %%% "circe-parser"% circeVersion,
-            "org.scala-lang.modules" %% "scala-collection-compat" % "0.3.0",
-            "org.scalatest" %%% "scalatest" % "3.0.5" % Test
+            "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1",
+            "org.scalatest" %%% "scalatest" % "3.0.8" % Test
         ),
+
+
+      scalacOptions ++= Seq("-target:jvm-1.8", "-feature", "-language:_"),
+
       addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
+
+      addCompilerPlugin(scalafixSemanticdb), // enable SemanticDB
       
-      addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.0-M4"),
+      addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.0"),
+
+      scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0",
+
+      scalacOptions ++= List("-Yrangepos", "-P:semanticdb:synthetics:on"),
 
       Seq(Compile, Test, Runtime).flatMap(inConfig(_) {
         unmanagedResourceDirectories ++= {
