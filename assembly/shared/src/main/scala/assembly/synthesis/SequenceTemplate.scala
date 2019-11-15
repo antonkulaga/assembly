@@ -6,7 +6,7 @@ import io.circe.generic.JsonCodec
 import scala.collection.SortedSet
 import io.circe.syntax._
 import cats.implicits._
-import scala.collection.compat._
+import io.circe.syntax._
 
 @JsonCodec case class StringTemplate(string: String) extends SequenceTemplate with SequenceTemplatePositional {
 
@@ -36,11 +36,13 @@ import scala.collection.compat._
 
 }
 
+object SequenceTemplatePositional
 trait SequenceTemplatePositional extends SequenceTemplate {
 
   def positionalRandomize(from: Int, len: Int, spans: (Int, Int)*): String
 }
 
+object SequenceTemplate
 trait SequenceTemplate {
   def randomize: String
   //def slice(from: Int, to: Int): SequenceTemplate

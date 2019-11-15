@@ -3,7 +3,7 @@ package assembly
 import java.security.SecureRandom
 
 import scala.annotation.tailrec
-import scala.collection.immutable.Map
+import scala.collection.immutable._
 import scala.util.Random
 
 package object extensions extends StringFunctions(SecureRandom.getInstance("NativePRNGNonBlocking", "SUN")) {

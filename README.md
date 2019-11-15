@@ -12,5 +12,5 @@ Adding to dependencies
 add the following to you build.sbt
 ```scala
 resolvers += sbt.Resolver.bintrayRepo("comp-bio-aging", "main")
-libraryDependencies += "group.aging-research" %% "assembly" % "0.0.11"
+libraryDependencies += "group.aging-research" %% "assembly" % "0.0.13"
 ```

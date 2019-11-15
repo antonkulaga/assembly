@@ -1,9 +1,8 @@
 package assembly.synthesis
-
-
+import io.circe.syntax._
 import io.circe.generic.JsonCodec
-import scala.collection.compat._
 
+object CheckerGC
 trait CheckerGC{
 
   def countGC(sequence: String): Int = sequence.toUpperCase.count{
@@ -25,7 +24,7 @@ trait CheckerGC{
     (min <= gc) && (gc <= max)
   }
 }
-
+object WindowGC
 /**
   * 1. Overall GC content in between 30% to 65%.
   * 2. A window of 100bp with GC content between 25% to 75%.

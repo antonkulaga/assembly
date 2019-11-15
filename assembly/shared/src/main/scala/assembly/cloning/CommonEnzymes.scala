@@ -1,7 +1,5 @@
 package assembly.cloning
 
-import scala.collection.compat._
-
 case object CommonEnzymes {
   val common: Set[(String, String)] = Set[(String, String)](
     "SinI" -> "GGWCC",

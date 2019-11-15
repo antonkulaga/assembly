@@ -3,20 +3,20 @@ import sbt.Keys._
 // shadow sbt-scalajs' crossProject and CrossType from Scala.js 0.6.x
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-lazy val circeVersion = "0.11.1"
+lazy val circeVersion = "0.12.3"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.13.1"
 
 lazy val assembly =
   crossProject(JSPlatform, JVMPlatform)
     .settings(
         name := "assembly",
 
-        scalaVersion := "2.12.8",
+        scalaVersion := "2.13.1",
 
         organization := "group.aging-research",
 
-	      version := "0.0.11",
+	      version := "0.0.13",
 
         resolvers += sbt.Resolver.bintrayRepo("comp-bio-aging", "main"),
 
@@ -35,27 +35,17 @@ lazy val assembly =
         licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
         
         libraryDependencies ++= Seq(
-            "org.typelevel" %%% "cats-core" % "1.6.1",
             "io.circe" %%% "circe-core"% circeVersion,
             "io.circe" %%% "circe-generic"% circeVersion,
-            "io.circe" %%% "circe-generic-extras"% circeVersion,
+            "io.circe" %%% "circe-generic-extras"% "0.12.2",//circeVersion,
             "io.circe" %%% "circe-parser"% circeVersion,
-            "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1",
             "org.scalatest" %%% "scalatest" % "3.0.8" % Test
         ),
 
 
-      scalacOptions ++= Seq("-target:jvm-1.8", "-feature", "-language:_"),
+      scalacOptions ++= Seq("-target:jvm-1.8", "-feature", "-language:_", "-Ymacro-annotations"),
 
-      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
-
-      addCompilerPlugin(scalafixSemanticdb), // enable SemanticDB
-      
-      addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.0"),
-
-      scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0",
-
-      scalacOptions ++= List("-Yrangepos", "-P:semanticdb:synthetics:on"),
+      addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
 
       Seq(Compile, Test, Runtime).flatMap(inConfig(_) {
         unmanagedResourceDirectories ++= {

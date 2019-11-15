@@ -2,7 +2,7 @@ package assembly.cloning
 
 import assembly.cloning
 import assembly.extensions._
-import scala.collection.compat._
+import scala.collection.immutable._
 import scala.io.Source
 /**
   * Class to work with restriction enzymes
@@ -15,7 +15,7 @@ case class RestrictionEnzymes(enzymes2sites: Set[(String, String)]) {
 
   lazy val sites2enzymes: Set[(String, String)] = enzymes2sites.map(_.swap)
 
-  lazy val seq2enzymesMap: Map[String, Set[String]] = sites2enzymes.groupBy(_._1).mapValues(s=>s.map(_._2))
+  lazy val seq2enzymesMap: Map[String, Set[String]] = sites2enzymes.groupBy(_._1).view.mapValues(s=>s.map(_._2)).toMap
 
   /*
   def find(where: String): Set[String] = seq2enzymesMap.flatMap{
@@ -24,9 +24,9 @@ case class RestrictionEnzymes(enzymes2sites: Set[(String, String)]) {
   */
 
   def find(where: String, reverseComplement: Boolean): Map[(String, String), List[Int]] = {
-    val found: Map[(String, String), List[Int]] = enzymes2sites.map{
+    val found = enzymes2sites.map{
       case (enzyme, site) => enzyme -> site-> site.inclusionsInto(where)
-    }.toMap
+    }.toMap[(String, String), List[Int]]
     if(reverseComplement) found ++ find(where.reverseComplement, reverseComplement = false) else found
   }
 

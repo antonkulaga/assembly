@@ -1,7 +1,7 @@
 package assembly.cloning
 import assembly.extensions._
 import assembly.synthesis.StringTemplate
-import scala.collection.compat._
+
 /**
   * Optimized for BsaI, did not check for others yet
   * @param enzyme

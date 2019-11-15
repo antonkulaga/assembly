@@ -2,7 +2,7 @@ package assembly.synthesis
 
 import assembly.cloning.{RestrictionEnzyme, _}
 import assembly.extensions._
-import scala.collection.compat._
+
 import scala.annotation.tailrec
 import scala.util.Try
 

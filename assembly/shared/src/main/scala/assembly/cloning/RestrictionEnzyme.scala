@@ -2,7 +2,7 @@ package assembly.cloning
 
 import scala.annotation.tailrec
 import assembly.extensions._
-import scala.collection.compat._
+
 
 case class RestrictionEnzyme(name: String, site: String, forwardCut: Int, reverseCut: Int) extends RestrictionEnzymeLike {
 
