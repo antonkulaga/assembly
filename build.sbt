@@ -15,7 +15,7 @@ lazy val assembly =
 
         organization := "com.github.antonkulaga",
 
-	      version := "0.0.13",
+	      version := "0.0.14",
 
         testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
 
