@@ -34,3 +34,4 @@ tags
 
 #MAC OS specific
 .DS_Store
+.bsp/

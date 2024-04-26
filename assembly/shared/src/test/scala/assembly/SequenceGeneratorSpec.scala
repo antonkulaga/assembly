@@ -7,7 +7,7 @@ import scala.util._
 import org.scalatest._
 import cats.implicits._
 
-class SequenceGeneratorSpec extends WordSpec with Matchers {
+class SequenceGeneratorSpec extends WordSpec with org.scalatest.matchers.should.Matchers {
 
   "Sequence generator" should {
     "generate sequence with proper GC" in {
@@ -40,7 +40,7 @@ class SequenceGeneratorSpec extends WordSpec with Matchers {
       lazy val parameters = default
       val base = generator.tryRandomize(parameters, 10000).get
       parameters.check(base) shouldEqual true
-      val gc = parameters.contentGC.countGC(base)
+      //val gc = parameters.contentGC.countGC(base)
       val fixed = base.slice(3, base.length -3)
       val newString: String = template.string.take(3) + fixed + template.string.takeRight(3)
       val newTemplate = template.copy(string = newString)
